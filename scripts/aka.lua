@@ -40,8 +40,9 @@ function send_status_text()
     -- Send the message
     -- mavlink:send(chan, mavlink_msgs.encode("MSG_NAME", {param1 = value1, param2 = value2, ...}})
     -- local result = mavlink:send_chan(0, mavlink_msgs.encode(id, {severity = severity, text = truncated_text}))
-    local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = truncated_text}))
-    local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = truncated_text}))
+    local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "USB TELEMETRY"}))
+    local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "RADIO TELEMETRY"}))
+    local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "OSD TELEMETRY"}))
     
     -- Check if the send was successful
     if result_osd then
