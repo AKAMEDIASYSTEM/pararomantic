@@ -25,32 +25,89 @@ mavlink:init(1, 10)  -- Adjust the parameters as needed for your use case
 
 -- note for other mavlink send functions you gotta have the corresponding mavlink_msg_FOOMSG.lua file (generated per line 17) in scripts/modules/MAVLink/
 
+local tseverity = 2  -- "Critical" level
+local currentIndex = 1
+local textArray = {
+    "CAN YOU MEET ME IN THE LOOP",
+    "TWO HAWKS SKY-WHEELING",
+    "INTIMATE TELEMETRY",
+    "FEELINGS | I WATCH THIS ONE GO BY",
+    "OUR MOMENT UP HERE",
+    "BARELY HANGING ON",
+    "JUST HOW I LIKE IT"
+}
+
 function send_status_text()
-    -- Example usage
-    local tseverity = 2  -- "Critical" level
-    local the_text = "O GOD I HAVE GOT A FEELING SO LOVELY"
-    -- Ensure the text is not longer than 50 characters
+    -- gcs:send_text(2, "Script started/restarted. Current Index: " .. tostring(currentIndex))
+
+    -- Ensure currentIndex is within bounds
+    if currentIndex > #textArray or currentIndex < 1 then
+        gcs:send_text(2, "currentIndex out of bounds: " .. tostring(currentIndex))
+        currentIndex = 1  -- Reset to 1 if out of bounds
+    end
+
+    local the_text = textArray[currentIndex]
     local truncated_text = the_text:sub(1, 50)
-    -- Check if mavlink object is initialized
-    if mavlink == nil then
-        gcs:send_text(2, "MAVLink object is nil")
+
+    if the_text == nil then
+        gcs:send_text(2, "the_text is nil at index: " .. tostring(currentIndex))
         return
     end
-    
-    -- Send the message
-    -- mavlink:send(chan, mavlink_msgs.encode("MSG_NAME", {param1 = value1, param2 = value2, ...}})
-    -- local result = mavlink:send_chan(0, mavlink_msgs.encode(id, {severity = severity, text = truncated_text}))
+
+    if mavlink == nil then
+            gcs:send_text(2, "MAVLink object is nil")
+            return
+        end
+
+    gcs:send_text(2, "Sending message: " .. the_text)
+
     local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "USB TELEMETRY"}))
     local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "RADIO TELEMETRY"}))
-    local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "OSD TELEMETRY"}))
-    
-    -- Check if the send was successful
-    if result_osd then
-        gcs:send_text(6, "STATUSTEXT message sent: " .. the_text)
-    else
-        gcs:send_text(2, "Failed to send STATUSTEXT message")
+    local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = truncated_text}))
+
+    -- Increment currentIndex for the next run
+    currentIndex = currentIndex + 1
+    if currentIndex > #textArray then
+        currentIndex = 1  -- Loop back to the first message
     end
-    return send_status_text, 3000
+    return send_status_text, 5000
 end
 
 return send_status_text()
+
+-- function send_status_text_orig()
+--     local tseverity = 2  -- "Critical" level
+--     local the_text = textArray[currentIndex]
+--     gcs:send_text(2, the_text)
+--     local truncated_text = the_text:sub(1, 50)
+
+--     gcs:send_text(2, "Current Index: " .. tostring(currentIndex))
+--     -- gcs:send_text(2, "textArray size: " .. tostring(#textArray))
+
+--     currentIndex = currentIndex + 1
+--     if currentIndex > #textArray then
+--         currentIndex = 1  -- Loop back to the first message (tables are weirdly 1-indexed gross)
+--     end
+
+--     -- Check if mavlink object is initialized
+--     if mavlink == nil then
+--         gcs:send_text(2, "MAVLink object is nil")
+--         return
+--     end
+--     -- Send the message
+--     -- mavlink:send(chan, mavlink_msgs.encode("MSG_NAME", {param1 = value1, param2 = value2, ...}})
+--     -- local result = mavlink:send_chan(0, mavlink_msgs.encode(id, {severity = severity, text = truncated_text}))
+    -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "USB TELEMETRY"}))
+    -- local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "RADIO TELEMETRY"}))
+    -- local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = truncated_text}))
+    
+--     -- Check if the send was successful
+--     -- if result_osd then
+--     --     gcs:send_text(6, "STATUSTEXT message sent: " .. the_text)
+--     -- else
+--     --     gcs:send_text(2, "Failed to send STATUSTEXT message")
+--     -- end
+--     return send_status_text, 5000
+-- end
+
+-- return send_status_text()
