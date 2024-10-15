@@ -29,31 +29,10 @@ currentIndex = 1
 function send_status_text()
     local textArray = {
     "CAN YOU MEET ME IN THE LOOP",
+    "FEELINGS - I WATCH THIS ONE GO BY",
     "OUR MOMENT UP HERE",
     "BARELY HANGING ON",
-    "ALWAYS ALREADY FALLING",
-    "EVERYTHING ON THE LINE",
-    "JUST HOW I LIKE IT",
-    " ",
-    " ",
-    "BREATHE",
-    " ",
-    " ",
-    "BREATHE",
-    " ",
-    " ",
-    "A FEELING SO LOVELY",
-    "INTIMATE TELEMETRY",
-    " ",
-    "THIS IS WHAT "
-    " ",
-    "WARM IN YOUR HIGH BEAMS",
-    " ",
-    "YAWPING MY EARNEST BIRDSONG",
-    " ",
-    "SURE AS A ROCKSLIDE",
-    "SURE AS A ROCKSLIDE",
-    "SURE AS A ROCKSLIDE"
+    "JUST HOW I LIKE IT"
     }
 
     -- Ensure currentIndex is within bounds
@@ -66,9 +45,9 @@ function send_status_text()
 
     local truncated_text = the_text:sub(1, 50)
     -- gcs:send_text(2, truncated_text)
-    local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
-    local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
-    -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text=truncated_text}))
+    -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "USB TELEMETRY"}))
+    -- local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text = "RADIO TELEMETRY"}))
+    local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text=truncated_text}))
     local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity= tseverity, text=truncated_text}))
 
     -- Increment currentIndex for the next run
@@ -76,7 +55,7 @@ function send_status_text()
     if currentIndex > #textArray then
         currentIndex = 1  -- Loop back to the first message
     end
-    return send_status_text, 15000
+    return send_status_text, 5000
 end
 
 return send_status_text()
