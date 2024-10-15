@@ -45,7 +45,7 @@ function send_status_text()
     "A FEELING SO LOVELY",
     "INTIMATE TELEMETRY",
     " ",
-    "THIS IS WHAT "
+    "O! COMMUNICATION",
     " ",
     "WARM IN YOUR HIGH BEAMS",
     " ",
@@ -53,7 +53,15 @@ function send_status_text()
     " ",
     "SURE AS A ROCKSLIDE",
     "SURE AS A ROCKSLIDE",
-    "SURE AS A ROCKSLIDE"
+    "SURE AS A ROCKSLIDE",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " "
     }
 
     -- Ensure currentIndex is within bounds
