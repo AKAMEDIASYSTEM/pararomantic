@@ -26,6 +26,11 @@ mavlink:init(1, 10)
 local tseverity = 2  -- "Critical" level
 currentIndex = 1
 
+-- Function to check if the quadcopter is armed and above 3 meters
+function is_above_3m_and_armed()
+    return arming:is_armed() and vehicle:get_relative_alt() >= 3
+end
+
 function send_status_text()
     local textArray = {
     "CAN YOU MEET ME IN THE LOOP",
@@ -80,20 +85,26 @@ function send_status_text()
         currentIndex = 1  -- Reset to 1 if out of bounds
     end
 
-    local the_text = textArray[currentIndex]
+    if is_above_3m_and_armed() then
+        local the_text = textArray[currentIndex]
+        local truncated_text = the_text:sub(1, 50)
+        -- gcs:send_text(2, truncated_text)
+        local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
+        local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
+        -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text=truncated_text}))
+        local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity= tseverity, text=truncated_text}))
 
-    local truncated_text = the_text:sub(1, 50)
-    -- gcs:send_text(2, truncated_text)
-    local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
-    local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text =truncated_text}))
-    -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text=truncated_text}))
-    local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity= tseverity, text=truncated_text}))
-
-    -- Increment currentIndex for the next run
-    currentIndex = currentIndex + 1
-    if currentIndex > #textArray then
-        currentIndex = 1  -- Loop back to the first message
-    end
+        -- Increment currentIndex for the next run
+        currentIndex = currentIndex + 1
+        if currentIndex > #textArray then
+            currentIndex = 1  -- Loop back to the first message
+        end
+    else
+        local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text ="AWAITING PERFECT TIME"}))
+        local result_radio_telem = mavlink:send_chan(1, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text ="AWAITING PERFECT TIME"}))
+        -- local result_mission_planner = mavlink:send_chan(0, mavlink_msgs.encode("STATUSTEXT", {severity = tseverity, text="AWAITING PERFECT TIME"}))
+        local result_osd = mavlink:send_chan(2, mavlink_msgs.encode("STATUSTEXT", {severity= tseverity, text="AWAITING PERFECT TIME"}))
+    
     return send_status_text, 7000
 end
 
