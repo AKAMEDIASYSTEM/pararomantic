@@ -84,7 +84,7 @@ function send_status_text()
     if currentIndex > #textArray then
         currentIndex = 1  -- Loop back to the first message
     end
-    return send_status_text, 15000
+    return send_status_text, 7000
 end
 
 return send_status_text()
