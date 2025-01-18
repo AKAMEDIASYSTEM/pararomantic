@@ -2,8 +2,8 @@ local RC7 = rc:get_channel(7)
 local CLEAR_OVERRIDE = 0
 local ENGAGE_ESTOP = 2000
 
-local START_SWOON = 15 -- swoon at 15m
-local SAVE_YOURSELF = 10 -- for now, recover from swoon at 10m
+local START_SWOON = 20 -- swoon at 15m
+local SAVE_YOURSELF = 15 -- for now, recover from swoon at 10m
 local is_armed = false  -- Track armed state
 local e_stop_activated = false  -- Track if emergency stop is active
 local initial_heading = 0  -- Store the initial heading at the time of arming
@@ -60,14 +60,14 @@ function update()
     -- Check heading deviation
     if is_armed then
         if ahrs_altitude > START_SWOON then
-            gcs:send_text(6, "alt deviation exceeded! Engaging E-stop.")
+            gcs:send_text(6, "SWOON")
             RC7:set_override(ENGAGE_ESTOP)
             e_stop_activated = true
         end
 
         -- Disengage E-stop if heading deviation is back within tolerance
         if ahrs_altitude < SAVE_YOURSELF and e_stop_activated then
-            gcs:send_text(6, "alt restored. Disengaging E-stop.")
+            gcs:send_text(6, "AWAKE")
             RC7:set_override(CLEAR_OVERRIDE)
             e_stop_activated = false
         end
