@@ -44,7 +44,7 @@ end
 function update()
     if is_script_active() then
         -- Get current heading
-        local yaw_deg = wrap_360(math.deg(ahrs:get_yaw()))
+        -- local yaw_deg = wrap_360(math.deg(ahrs:get_yaw()))
         local this_alt = baro:get_altitude()
         local dist = ahrs:get_relative_position_NED_home()
         if dist then
@@ -56,14 +56,14 @@ function update()
             -- Quad just got armed
             is_armed = true
             -- initial_heading = yaw_deg  -- Store the initial heading
-            arm_message = string.format("Quadcopter armed. We see baro:get_altitude as %f and ahrs alt as %f", this_alt, ahrs_altitude)
+            arm_message = string.format("Armed. baro-alt %f AHRS-alt %f", this_alt, ahrs_altitude)
             -- gcs:log(arm_message)
             gcs:send_text(6, arm_message)
         elseif is_armed and not arming:is_armed() then
             -- Quad got disarmed
             is_armed = false
             e_stop_activated = false
-            disarm_message = string.format("Quadcopter disarmed, baro:get_altitude as %f and ahrs alt as %f", this_alt, ahrs_altitude)
+            disarm_message = string.format("Disarmed. baro-alt %f AHRS-alt %f", this_alt, ahrs_altitude)
             -- gcs:log(disarm_message)
             gcs:send_text(6, disarm_message)
             RC7:set_override(CLEAR_OVERRIDE)  -- Ensure override is cleared
