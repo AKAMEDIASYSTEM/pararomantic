@@ -6,7 +6,7 @@ local CLEAR_OVERRIDE = 0
 local ENGAGE_ESTOP = 2000
 
 local START_SWOON = 20 -- swoon at 15m
-local SAVE_YOURSELF = 15 -- for now, recover from swoon at 10m
+local SAVE_YOURSELF = 18 -- for now, recover from swoon at 10m
 local is_armed = false  -- Track armed state
 local e_stop_activated = false  -- Track if emergency stop is active
 local initial_heading = 0  -- Store the initial heading at the time of arming
