@@ -15,13 +15,8 @@ local heading_tolerance = 10  -- Heading change tolerance in degrees
 local tseverity = 2  -- "Critical" level
 currentIndex = 1
 
-function wrap_360(angle)
-    local res = angle % 360
-    if res < 0 then
-      res = res + 360
-    end
-    return res
-end
+-- Track the previous state of the script activation channel
+local prev_script_active = false
 
 function wrap_360(angle)
     local res = angle % 360
@@ -42,6 +37,17 @@ local function is_script_active()
 end
 
 function update()
+ -- Debug: alert on RC8 (script activation) toggles
+    local script_active = is_script_active()
+    if script_active ~= prev_script_active then
+        if script_active then
+            gcs:send_text(tseverity, "RC8 toggled HIGH")
+        else
+            gcs:send_text(tseverity, "RC8 toggled LOW")
+        end
+        prev_script_active = script_active
+    end
+
     if is_script_active() then
         -- Get current heading
         -- local yaw_deg = wrap_360(math.deg(ahrs:get_yaw()))
